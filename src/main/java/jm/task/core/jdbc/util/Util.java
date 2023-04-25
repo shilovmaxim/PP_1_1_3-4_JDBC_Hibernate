@@ -15,20 +15,20 @@ public class Util {
     private static int attempt = 0;
 
     /**
-     * Делает до трех попыток подключения к БД с промежутком 1 сек.
+     * Делает до трех попыток подключения к БД.
      *
      * @throws SQLException if a database access error
      * @attempt: Количество попыток подключения к базе
      */
-    public static Connection getConnection() throws InterruptedException {
+    public static Connection getConnection() {
 
-        try (Connection connection = DriverManager.getConnection(URL, USER, PASSWORD)) {
-            LOGGER.log(Level.INFO, "Successful connection to the database");
+        try {
+            Connection connection = DriverManager.getConnection(URL, USER, PASSWORD);
+            LOGGER.log(Level.INFO, "Successful connection to the database \"store\"");
             return connection;
         } catch (SQLException e) {
-            LOGGER.log(Level.SEVERE, "Database connection error");
+            LOGGER.log(Level.SEVERE, "Database connection error", e);
         }
-        Thread.sleep(1000);
         attempt++;
         return attempt > 3 ? null : getConnection();
     }
