@@ -3,10 +3,7 @@ package jm.task.core.jdbc.dao;
 import jm.task.core.jdbc.model.User;
 import jm.task.core.jdbc.util.Util;
 
-import java.sql.Connection;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.sql.Statement;
+import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
@@ -52,9 +49,12 @@ public class UserDaoJDBCImpl implements UserDao {
 
     public void saveUser(String name, String lastName, byte age) {
         Connection conn;
-        try (Statement statement = Objects.requireNonNull(conn = Util.getConnection()).createStatement()) {
-            statement.executeUpdate(
-                    "INSERT INTO users (name, lastName, age) Values ('" + name + "', '" + lastName + "', " + age + ")");
+        try (PreparedStatement prepStatement = (conn = Util.getConnection()).prepareStatement(
+                "INSERT INTO users (name, lastName, age) Values (?, ?, ?)")) {
+            prepStatement.setString(1, name);
+            prepStatement.setString(2, lastName);
+            prepStatement.setByte(3, age);
+            prepStatement.executeUpdate();
             conn.commit();
             LOGGER.log(Level.INFO, "The following data has been successfully saved to the \"users\" table: "
                     + name + " " + lastName + " " + age);
@@ -66,8 +66,10 @@ public class UserDaoJDBCImpl implements UserDao {
 
     public void removeUserById(long id) {
         Connection conn;
-        try (Statement statement = Objects.requireNonNull(conn = Util.getConnection()).createStatement()) {
-            statement.executeUpdate("DELETE FROM users WHERE Id=" + id);
+        try (PreparedStatement prepStatement = (conn = Util.getConnection()).prepareStatement(
+                "DELETE FROM users WHERE Id = ?")) {
+            prepStatement.setLong(1, id);
+            prepStatement.executeUpdate();
             conn.commit();
             LOGGER.log(Level.INFO, "Request completed successfully. User from id = " + id + " removed.");
         } catch (SQLException e) {
