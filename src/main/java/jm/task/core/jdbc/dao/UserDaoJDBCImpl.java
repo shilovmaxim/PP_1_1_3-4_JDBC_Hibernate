@@ -43,7 +43,7 @@ public class UserDaoJDBCImpl implements UserDao {
             LOGGER.log(Level.INFO, "Successful dropped table \"users\".");
 
         } catch (SQLException e) {
-            LOGGER.log(Level.SEVERE, "Failed to dropped a table.", e);
+            LOGGER.log(Level.SEVERE, "Failed to drop a table.", e);
         }
     }
 
@@ -80,7 +80,7 @@ public class UserDaoJDBCImpl implements UserDao {
                 user.setId(resultSet.getLong("Id"));
                 usersList.add(user);
             }
-            LOGGER.log(Level.INFO, "Request completed successfully.");
+            LOGGER.log(Level.INFO, "Request completed successfully. The list of users has been received");
         } catch (SQLException e) {
             LOGGER.log(Level.SEVERE, "Request execution error.", e);
         }
