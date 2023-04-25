@@ -18,6 +18,7 @@ public class Util {
 
         try {
             Connection connection = DriverManager.getConnection(URL, USER, PASSWORD);
+            connection.setAutoCommit(false);
             LOGGER.log(Level.INFO, "Successful connection to the database \"store\"");
             return connection;
         } catch (SQLException e) {
