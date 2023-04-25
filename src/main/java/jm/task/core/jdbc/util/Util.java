@@ -16,8 +16,6 @@ public class Util {
 
     /**
      * Делает до трех попыток подключения к БД.
-     *
-     * @throws SQLException if a database access error
      * @attempt: Количество попыток подключения к базе
      */
     public static Connection getConnection() {

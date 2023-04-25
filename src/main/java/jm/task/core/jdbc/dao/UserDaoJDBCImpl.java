@@ -1,35 +1,101 @@
 package jm.task.core.jdbc.dao;
 
 import jm.task.core.jdbc.model.User;
+import jm.task.core.jdbc.util.Util;
 
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Statement;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 public class UserDaoJDBCImpl implements UserDao {
+    private static final Logger LOGGER = Logger.getLogger(UserDaoJDBCImpl.class.getName());
+
     public UserDaoJDBCImpl() {
 
     }
 
     public void createUsersTable() {
+        try (Statement statement = Objects.requireNonNull(Util.getConnection()).createStatement()) {
+            statement.executeUpdate(
+                    "CREATE TABLE IF NOT EXISTS users " +
+                            "(Id INT PRIMARY KEY AUTO_INCREMENT," +
+                            " name VARCHAR(50)," +
+                            " lastName VARCHAR(50)," +
+                            " age INT(3))"
+            );
+            LOGGER.log(Level.INFO, "Successful created table \"users\".");
 
+        } catch (SQLException e) {
+            LOGGER.log(Level.SEVERE, "Failed to create a table.", e);
+        }
     }
 
     public void dropUsersTable() {
+        try (Statement statement = Objects.requireNonNull(Util.getConnection()).createStatement()) {
+            statement.executeUpdate(
+                    "DROP TABLE users"
+            );
+            LOGGER.log(Level.INFO, "Successful dropped table \"users\".");
 
+        } catch (SQLException e) {
+            LOGGER.log(Level.SEVERE, "Failed to dropped a table.", e);
+        }
     }
 
     public void saveUser(String name, String lastName, byte age) {
-
+        try (Statement statement = Objects.requireNonNull(Util.getConnection()).createStatement()) {
+            statement.executeUpdate(
+                    "INSERT INTO users (name, lastName, age) Values ('" + name + "', '" + lastName + "', " + age + ")");
+            LOGGER.log(Level.INFO, "The following data has been successfully saved to the \"users\" table: "
+                    + name + " " + lastName + " " + age);
+            System.out.println("User с именем – " + name + " добавлен в базу данных");
+        } catch (SQLException e) {
+            LOGGER.log(Level.SEVERE, "Data saving error.", e);
+        }
     }
 
     public void removeUserById(long id) {
-
+        try (Statement statement = Objects.requireNonNull(Util.getConnection()).createStatement()) {
+            statement.executeUpdate("DELETE FROM users WHERE Id=" + id);
+            LOGGER.log(Level.INFO, "Request completed successfully. User from id = " + id + " removed.");
+        } catch (SQLException e) {
+            LOGGER.log(Level.SEVERE, "Request execution error.", e);
+        }
     }
 
     public List<User> getAllUsers() {
-        return null;
+        List<User> usersList = new ArrayList<>();
+        try (Statement statement = Objects.requireNonNull(Util.getConnection()).createStatement()) {
+            ResultSet resultSet = statement.executeQuery("SELECT * FROM users");
+            while (resultSet.next()) {
+                User user = new User(
+                        resultSet.getString("name"),
+                        resultSet.getString("lastName"),
+                        resultSet.getByte("age"));
+                user.setId(resultSet.getLong("Id"));
+                usersList.add(user);
+            }
+            LOGGER.log(Level.INFO, "Request completed successfully.");
+        } catch (SQLException e) {
+            LOGGER.log(Level.SEVERE, "Request execution error.", e);
+        }
+        return usersList;
     }
 
     public void cleanUsersTable() {
+        try (Statement statement = Objects.requireNonNull(Util.getConnection()).createStatement()) {
+            statement.executeUpdate(
+                    "TRUNCATE TABLE users "
+            );
+            LOGGER.log(Level.INFO, "Successful truncated table \"users\".");
 
+        } catch (SQLException e) {
+            LOGGER.log(Level.SEVERE, "Failed to truncated a table.", e);
+        }
     }
 }
