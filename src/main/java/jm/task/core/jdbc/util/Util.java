@@ -9,7 +9,6 @@ import java.util.logging.Logger;
 public class Util {
     private final static String URL = "jdbc:mysql://localhost/store?serverTimezone=Europe/Moscow&useSSL=false";
     private final static String USER = "root";
-    //used!Agency5Total7
     private final static String PASSWORD = "used!Agency5Total7";
 
     private static final Logger LOGGER = Logger.getLogger(Util.class.getName());
