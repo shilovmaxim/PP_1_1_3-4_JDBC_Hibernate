@@ -37,7 +37,7 @@ public class UserDaoJDBCImpl implements UserDao {
     public void dropUsersTable() {
         try (Statement statement = connection.createStatement()) {
             statement.executeUpdate(
-                    "DROP TABLE users"
+                    "DROP TABLE IF EXISTS users"
             );
             connectionCommit();
             LOGGER.log(Level.INFO, "Successful dropped table \"users\".");
@@ -104,7 +104,7 @@ public class UserDaoJDBCImpl implements UserDao {
     public void cleanUsersTable() {
         try (Statement statement = connection.createStatement()) {
             statement.executeUpdate(
-                    "TRUNCATE TABLE users "
+                    "TRUNCATE TABLE users"
             );
             connectionCommit();
             LOGGER.log(Level.INFO, "Successful truncated table \"users\".");
