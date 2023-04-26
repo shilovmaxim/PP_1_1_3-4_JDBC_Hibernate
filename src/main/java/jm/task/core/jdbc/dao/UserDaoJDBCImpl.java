@@ -114,6 +114,16 @@ public class UserDaoJDBCImpl implements UserDao {
         }
     }
 
+    @Override
+    public void connectionClose() {
+        try {
+            connection.close();
+            LOGGER.log(Level.INFO, "Database connection successfully closed.");
+        } catch (SQLException e) {
+            LOGGER.log(Level.SEVERE, "DB error.", e);
+        }
+    }
+
     public void connectionCommit() {
         try {
             connection.commit();
