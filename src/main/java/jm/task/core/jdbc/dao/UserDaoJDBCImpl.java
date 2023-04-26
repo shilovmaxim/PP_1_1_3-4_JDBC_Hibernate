@@ -6,11 +6,11 @@ import jm.task.core.jdbc.util.Util;
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Objects;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
 public class UserDaoJDBCImpl implements UserDao {
+    private final Connection connection = Util.getConnection();
     private static final Logger LOGGER = Logger.getLogger(UserDaoJDBCImpl.class.getName());
 
     public UserDaoJDBCImpl() {
@@ -18,8 +18,7 @@ public class UserDaoJDBCImpl implements UserDao {
     }
 
     public void createUsersTable() {
-        Connection conn;
-        try (Statement statement = Objects.requireNonNull(conn = Util.getConnection()).createStatement()) {
+        try (Statement statement = connection.createStatement()) {
             statement.executeUpdate(
                     "CREATE TABLE IF NOT EXISTS users " +
                             "(Id INT PRIMARY KEY AUTO_INCREMENT," +
@@ -27,60 +26,63 @@ public class UserDaoJDBCImpl implements UserDao {
                             " lastName VARCHAR(50)," +
                             " age INT(3))"
             );
-            conn.commit();
+            connectionCommit();
             LOGGER.log(Level.INFO, "Successful created table \"users\".");
         } catch (SQLException e) {
+            connectionRollback();
             LOGGER.log(Level.SEVERE, "Failed to create a table.", e);
         }
     }
 
     public void dropUsersTable() {
-        Connection conn;
-        try (Statement statement = Objects.requireNonNull(conn = Util.getConnection()).createStatement()) {
+        try (Statement statement = connection.createStatement()) {
             statement.executeUpdate(
                     "DROP TABLE users"
             );
-            conn.commit();
+            connectionCommit();
             LOGGER.log(Level.INFO, "Successful dropped table \"users\".");
         } catch (SQLException e) {
+            connectionRollback();
             LOGGER.log(Level.SEVERE, "Failed to drop a table.", e);
+
         }
+        connectionCommit();
+
     }
 
     public void saveUser(String name, String lastName, byte age) {
-        Connection conn;
-        try (PreparedStatement prepStatement = (conn = Util.getConnection()).prepareStatement(
+        try (PreparedStatement prepStatement = connection.prepareStatement(
                 "INSERT INTO users (name, lastName, age) Values (?, ?, ?)")) {
             prepStatement.setString(1, name);
             prepStatement.setString(2, lastName);
             prepStatement.setByte(3, age);
             prepStatement.executeUpdate();
-            conn.commit();
+            connectionCommit();
             LOGGER.log(Level.INFO, "The following data has been successfully saved to the \"users\" table: "
                     + name + " " + lastName + " " + age);
             System.out.println("User с именем – " + name + " добавлен в базу данных");
         } catch (SQLException e) {
+            connectionRollback();
             LOGGER.log(Level.SEVERE, "Data saving error.", e);
         }
     }
 
     public void removeUserById(long id) {
-        Connection conn;
-        try (PreparedStatement prepStatement = (conn = Util.getConnection()).prepareStatement(
+        try (PreparedStatement prepStatement = connection.prepareStatement(
                 "DELETE FROM users WHERE Id = ?")) {
             prepStatement.setLong(1, id);
             prepStatement.executeUpdate();
-            conn.commit();
+            connectionCommit();
             LOGGER.log(Level.INFO, "Request completed successfully. User from id = " + id + " removed.");
         } catch (SQLException e) {
+            connectionRollback();
             LOGGER.log(Level.SEVERE, "Request execution error.", e);
         }
     }
 
     public List<User> getAllUsers() {
-        Connection conn;
         List<User> usersList = new ArrayList<>();
-        try (Statement statement = Objects.requireNonNull(conn =Util.getConnection()).createStatement()) {
+        try (Statement statement = connection.createStatement()) {
             ResultSet resultSet = statement.executeQuery("SELECT * FROM users");
             while (resultSet.next()) {
                 User user = new User(
@@ -90,25 +92,48 @@ public class UserDaoJDBCImpl implements UserDao {
                 user.setId(resultSet.getLong("Id"));
                 usersList.add(user);
             }
-            conn.commit();
+            connectionCommit();
             LOGGER.log(Level.INFO, "Request completed successfully. The list of users has been received");
         } catch (SQLException e) {
+            connectionRollback();
             LOGGER.log(Level.SEVERE, "Request execution error.", e);
         }
         return usersList;
     }
 
     public void cleanUsersTable() {
-        Connection conn;
-        try (Statement statement = Objects.requireNonNull(conn = Util.getConnection()).createStatement()) {
+        try (Statement statement = connection.createStatement()) {
             statement.executeUpdate(
                     "TRUNCATE TABLE users "
             );
-            conn.commit();
+            connectionCommit();
             LOGGER.log(Level.INFO, "Successful truncated table \"users\".");
-
         } catch (SQLException e) {
+            connectionRollback();
             LOGGER.log(Level.SEVERE, "Failed to truncated a table.", e);
+        }
+    }
+
+    public void connectionCommit() {
+        try {
+            connection.commit();
+        } catch (SQLException e) {
+            LOGGER.log(Level.SEVERE, "DB connection error.", e);
+        }
+    }
+
+    public void connectionRollback() {
+        try {
+            connection.rollback();
+            LOGGER.log(Level.SEVERE, "DB error.");
+        } catch (SQLException e1) {
+            LOGGER.log(Level.SEVERE, "DB connection error.", e1);
+        } finally {
+            try {
+                connection.setAutoCommit(true);
+            } catch (SQLException e2) {
+                LOGGER.log(Level.SEVERE, "DB connection error.", e2);
+            }
         }
     }
 }
