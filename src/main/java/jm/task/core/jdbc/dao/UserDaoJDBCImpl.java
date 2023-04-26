@@ -131,6 +131,7 @@ public class UserDaoJDBCImpl implements UserDao {
         } finally {
             try {
                 connection.setAutoCommit(true);
+                connection.close();
             } catch (SQLException e2) {
                 LOGGER.log(Level.SEVERE, "DB connection error.", e2);
             }
