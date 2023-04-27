@@ -10,13 +10,13 @@ public class User {
     @Column(name = "Id")
     private Long id;
 
-    @Column(name = "name")
+    @Column(name = "name", length = 50)
     private String name;
 
-    @Column(name = "lastName")
+    @Column(name = "lastName", length = 50)
     private String lastName;
 
-    @Column(name = "age")
+    @Column(name = "age", nullable = false, length = 3)
     private Byte age;
 
     public User() {
