@@ -6,14 +6,11 @@ import javax.persistence.*;
 @Table(name = "users")
 public class User {
     @Id
-    @GeneratedValue
-    @Column(name = "Id")
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(name = "name", length = 50)
     private String name;
 
-    @Column(name = "lastName", length = 50)
     private String lastName;
 
     @Column(name = "age", nullable = false, length = 3)

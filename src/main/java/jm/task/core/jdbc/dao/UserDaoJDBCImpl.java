@@ -21,7 +21,7 @@ public class UserDaoJDBCImpl implements UserDao {
         try (Statement statement = connection.createStatement()) {
             statement.executeUpdate(
                     "CREATE TABLE IF NOT EXISTS users " +
-                            "(Id INT PRIMARY KEY AUTO_INCREMENT," +
+                            "(id INT PRIMARY KEY AUTO_INCREMENT," +
                             " name VARCHAR(50)," +
                             " lastName VARCHAR(50)," +
                             " age INT(3))"
@@ -69,7 +69,7 @@ public class UserDaoJDBCImpl implements UserDao {
 
     public void removeUserById(long id) {
         try (PreparedStatement prepStatement = connection.prepareStatement(
-                "DELETE FROM users WHERE Id = ?")) {
+                "DELETE FROM users WHERE id = ?")) {
             prepStatement.setLong(1, id);
             prepStatement.executeUpdate();
             connectionCommit();
@@ -89,7 +89,7 @@ public class UserDaoJDBCImpl implements UserDao {
                         resultSet.getString("name"),
                         resultSet.getString("lastName"),
                         resultSet.getByte("age"));
-                user.setId(resultSet.getLong("Id"));
+                user.setId(resultSet.getLong("id"));
                 usersList.add(user);
             }
             connectionCommit();
