@@ -110,7 +110,7 @@ public class UserDaoJDBCImpl implements UserDao {
             LOGGER.log(Level.INFO, "Successful truncated table \"users\".");
         } catch (SQLException e) {
             connectionRollback();
-            LOGGER.log(Level.SEVERE, "Failed to truncated a table.", e);
+            LOGGER.log(Level.SEVERE, "Failed to truncate a table.", e);
         }
     }
 
