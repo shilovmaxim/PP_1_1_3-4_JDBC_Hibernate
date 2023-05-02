@@ -35,7 +35,7 @@ public class UserDaoHibernateImpl implements UserDao {
             session.getTransaction().commit();
             LOGGER.log(Level.INFO, "Successful created table \"users\".");
         } catch (Exception e) {
-            connectionRollback();
+            session.getTransaction().rollback();
             LOGGER.log(Level.SEVERE, "Failed to create a table.", e);
         } finally {
             session.close();
@@ -51,7 +51,7 @@ public class UserDaoHibernateImpl implements UserDao {
             session.getTransaction().commit();
             LOGGER.log(Level.INFO, "Successful dropped table \"users\".");
         } catch (Exception e) {
-            connectionRollback();
+            session.getTransaction().rollback();
             LOGGER.log(Level.SEVERE, "Failed to drop a table.", e);
         } finally {
             session.close();
@@ -69,7 +69,7 @@ public class UserDaoHibernateImpl implements UserDao {
                     + name + " " + lastName + " " + age);
             System.out.println("User с именем – " + name + " добавлен в базу данных");
         } catch (Exception e) {
-            connectionRollback();
+            session.getTransaction().rollback();
             LOGGER.log(Level.SEVERE, "Data saving error.", e);
         } finally {
             session.close();
@@ -85,7 +85,7 @@ public class UserDaoHibernateImpl implements UserDao {
             session.getTransaction().commit();
             LOGGER.log(Level.INFO, "Request completed successfully. User from id = " + id + " removed.");
         } catch (Exception e) {
-            connectionRollback();
+            session.getTransaction().rollback();
             LOGGER.log(Level.SEVERE, "Request execution error.", e);
         } finally {
             session.close();
@@ -102,7 +102,7 @@ public class UserDaoHibernateImpl implements UserDao {
             session.getTransaction().commit();
             LOGGER.log(Level.INFO, "Request completed successfully. The list of users has been received");
         } catch (Exception e) {
-            connectionRollback();
+            session.getTransaction().rollback();
             LOGGER.log(Level.SEVERE, "Request execution error.", e);
         } finally {
             session.close();
@@ -120,24 +120,11 @@ public class UserDaoHibernateImpl implements UserDao {
             session.getTransaction().commit();
             LOGGER.log(Level.INFO, "Successful clean table \"users\".");
         } catch (Exception e) {
+            session.getTransaction().rollback();
             LOGGER.log(Level.SEVERE, "Failed to clean a table.", e);
         } finally {
             session.close();
         }
     }
 
-    public void connectionRollback() {
-        if (session != null) {
-            session.getTransaction().rollback();
-        }
-        connectionClose();
-    }
-
-    @Override
-    public void connectionClose() {
-        if (session != null) {
-            session.close();
-        }
-        Util.close();
-    }
 }
